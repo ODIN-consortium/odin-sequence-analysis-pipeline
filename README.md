@@ -10,5 +10,4 @@ should not be used for analysis runs.
 - `longread_analysis`: long-read sequence analysis pipeline.
 - `wgs_analysis`: whole-genome sequencing analysis pipeline.
 
-Switch to the branch for the pipeline you want to use before running or editing
-pipeline code.
+Switch to the branch for the pipeline you want to use before running pipeline code.
