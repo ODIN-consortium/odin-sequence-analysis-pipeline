@@ -1,40 +1,73 @@
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/bactopia/bactopia)](https://github.com/bactopia/bactopia/releases)
-[![mSystems](https://img.shields.io/badge/DOI-mSystems.00190--20-blue)](https://doi.org/10.1128/mSystems.00190-20)
-[![Anaconda-Server Badge](https://anaconda.org/bioconda/bactopia/badges/downloads.svg)](https://anaconda.org/bioconda/bactopia)
 
-![Bactopia Logo](data/bactopia-logo.png)
-
-# Bactopia
-Bactopia is a flexible pipeline for complete analysis of bacterial genomes. The goal of Bactopia
-is to process your data with a broad set of tools, so that you can get to the fun part of
-analyses quicker!
-
-Bactopia can be split into two main parts:
-[Bactopia Analysis Pipeline](https://bactopia.io/beginners-guide/), and
-[Bactopia Tools](https://bactopia.io/bactopia-tools/).
+# Introduction
+WGS_analysis pipeline is a bioinformatics pipeline based on Bactopia for complete analysis of bacterial genomes. 
 
 
-Bactopia Analysis Pipeline is the main *per-isolate* workflow in Bactopia. Built with
-[Nextflow](https://www.nextflow.io/), input FASTQs (local or available from SRA/ENA)
-are put through numerous analyses including: quality control, assembly, annotation,
-minmer sketch queries, sequence typing, and more.
 
-![Bactopia Overview](data/wgs.png)
+## Pipeline summary
+![Pipeline Overview](data/wgs.png)
 
-Bactopia Tools are a set a independent workflows for comparative analyses. The comparative analyses
-may include summary reports, pan-genome, or phylogenetic tree construction. Using the
-[predictable output structure](https://bactopia.io/full-guide/) of Bactopia you can
-pick and choose which samples to include for processing with a Bactopia Tool.
 
-Bactopia was inspired by [Staphopia](https://staphopia.github.io/), a workflow we (Tim Read and myself)
-released that targets *Staphylococcus aureus* genomes. Using what we learned from Staphopia and user
-feedback, Bactopia was developed from scratch with usability, portability, and speed in mind from
-the start.
+This pipeline is a bioinformatics workflow for whole-genome sequencing (WGS) analysis. The WGS_analysis pipeline is built with [Nextflow](https://www.nextflow.io/) It takes raw sequencing reads as input and performs read preprocessing, quality control, genome assembly, taxonomic assignment, functional annotation, antimicrobial resistance detection, MLST typing, cg/wgMLST analysis, and phylogenetic tree construction.
 
-# Documentation
-Documentation for Bactopia is available at https://bactopia.io/. The documentation includes
-a tutorial replicating [Staphopia](https://staphopia.github.io/) and a complete overview of
-Bactopia. I highly encourage you check it out!
+The workflow is designed to provide a reproducible end-to-end analysis starting from raw FASTQ files and producing standardised outputs for downstream genomic epidemiology, pathogen surveillance, and comparative genomics.
+
+The pipeline performs the following steps:
+
+1. **Input data**
+   - Accepts raw sequencing reads, typically paired-end FASTQ files.
+
+2. **Adapter removal and read trimming**
+   - Removes sequencing adapters and low-quality bases using [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic).
+
+3. **Read quality control**
+   - Performs quality assessment of raw and/or trimmed reads using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
+   - Samples that do not pass defined quality-control thresholds can be flagged or aborted before downstream analysis.
+
+4. **Genome assembly**
+   - Assembles quality-filtered reads into draft genome assemblies using [SPAdes](https://github.com/ablab/spades).
+   - Assembly quality thresholds can be used to stop low-quality samples before further analysis.
+
+5. **Taxonomy mapping**
+   - Assigns taxonomy to assembled genomes using [GTDB-Tk](https://github.com/Ecogenomics/GTDBTk), based on the Genome Taxonomy Database framework.
+
+6. **Functional annotation**
+   - Annotates assembled genomes and predicts coding sequences, rRNAs, tRNAs, and other genomic features using [Prokka](https://github.com/tseemann/prokka).
+
+7. **Antimicrobial resistance detection**
+   - Screens assembled genomes for antimicrobial resistance genes and resistance-associated point mutations using [AMRFinderPlus](https://github.com/ncbi/amr).
+
+8. **MLST typing**
+   - Performs multi-locus sequence typing using [stringMLST](https://github.com/jordanlab/stringMLST).
+   - MLST allele and sequence type information is retrieved using the [PubMLST](https://pubmlst.org/) database.
+
+9. **cg/wgMLST analysis**
+   - Performs core genome or whole genome MLST allele calling using [chewBBACA](https://github.com/B-UMMI/chewBBACA).
+   - This step supports high-resolution comparison of related *Vibrio cholerae* isolates.
+
+10. **Phylogenetic tree construction**
+    - Builds a phylogenetic tree from allelic profiles or genome comparison outputs using [GrapeTree](https://github.com/achtman-lab/GrapeTree).
+    - The resulting tree can be used for isolate clustering, outbreak investigation, and genomic epidemiology interpretation.
+
+## Main outputs
+
+The pipeline generates the following major output files and reports:
+
+- Trimmed FASTQ files from adapter and quality trimming
+- FastQC quality-control reports
+- Draft genome assemblies in FASTA format
+- Taxonomic classification results from GTDB-Tk
+- Functional genome annotation files from Prokka
+- Antimicrobial resistance gene and mutation reports from AMRFinderPlus
+- MLST sequence type results
+- cg/wgMLST allele profiles from chewBBACA
+- Phylogenetic tree files and visualisation-ready outputs from GrapeTree
+- Log files and summary reports for tracking pipeline execution and sample status
+
+## Intended use
+
+This workflow is intended for genomic analysis of whole-genome sequencing data. It can be used for pathogen surveillance, outbreak investigation, comparative genomics, antimicrobial resistance monitoring, and generation of standardised genomic outputs for downstream interpretation.
+
 
 # Quick Start
 ```
